@@ -1,0 +1,37 @@
+[
+  {
+    "table": "description",
+    "method": "insert",
+    "record": {
+      "id": 51,
+      "body": "sdfsdf",
+      "deleted": null
+    }
+  },
+  {
+    "table": "issue",
+    "method": "update",
+    "where": {
+      "id": 41
+    },
+    "record": {
+      "priority": 0,
+      "modified": 1750983323401
+    }
+  },
+  {
+    "table": "issue",
+    "method": "insert",
+    "record": {
+      "id": 51,
+      "title": "hey johannes",
+      "creator": "John Doe",
+      "priority": 1,
+      "status": 1,
+      "created": 1750983337323,
+      "deleted": null,
+      "modified": 1750983337323,
+      "kanbanorder": "an"
+    }
+  }
+]

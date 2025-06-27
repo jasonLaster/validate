@@ -1,0 +1,47 @@
+{
+  "type": "state_mutation_match",
+  "mutations": [
+    {
+      "action": "INSERT",
+      "tablename": "description",
+      "values": {
+        "id": { "type": "mutation_variable", "name": "id" },
+        "body": "sdfsdf",
+        "deleted": null
+      }
+    },
+    {
+      "action": "UPDATE",
+      "tablename": "issue",
+      "where": {
+        "id": 41
+      },
+      "values": {
+        "priority": 0,
+        "modified": 1750983323401
+      }
+    },
+    {
+      "action": "INSERT",
+      "tablename": "issue",
+      "values": {
+        "id": { "type": "mutation_variable", "name": "id" },
+        "title": "hey johannes",
+        "creator": "John Doe",
+        "priority": 1,
+        "status": 1,
+        "created": 1750983337323,
+        "deleted": null,
+        "modified": 1750983337323,
+        "kanbanorder": "an"
+      }
+    },
+    {
+      "action": "INSERT",
+      "tablename": "description",
+      "values": {
+        "body": { "type": "regex", "regex": ".*sdf.*" }
+      }
+    }
+  ]
+}
