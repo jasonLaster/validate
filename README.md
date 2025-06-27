@@ -10,6 +10,24 @@ This project provides two main scripts for working with database state changes:
 - [Bun](https://bun.sh/) runtime
 - `sqldiff` (from SQLite tools) must be available in your PATH for `diff.ts`
 
+**sqldiff is required for diff.ts.**
+Install it on macOS with:
+
+```sh
+brew install sqldiff
+```
+
+This will make the `sqldiff` command available in your PATH.
+
+**Obtaining Database Files:**
+If you are working in a development environment where the database is managed by a live store, you can download the SQLite database files using:
+
+```js
+await __debugLiveStore.default._dev.downloadDb();
+```
+
+This will save the current state of the database to a `.db` file, which you can then use with `diff.ts`.
+
 ---
 
 ## `diff.ts`
@@ -26,6 +44,8 @@ bun diff.ts <before.db> <after.db>
 
 - `<before.db>`: Path to the original SQLite database file
 - `<after.db>`: Path to the modified SQLite database file
+
+e.g. `bun diff.ts ./data/before.db ./data/after.db`
 
 ### Output
 
@@ -63,6 +83,8 @@ bun diff.ts before.db after.db > diff.json
 
 Validates that a set of expected state mutations (verifier spec) are present in a diff (as produced by `diff.ts`).
 
+Based on Plato.so's verifier format [link](https://www.notion.so/Plato-so-tasks-20aa334e229080398a21fca01a2bac23)
+
 ### Usage
 
 ```sh
@@ -95,12 +117,48 @@ A verifier spec is a JSON object like:
 }
 ```
 
+#### How Value Matching Works
+
+Each mutation in the verifier describes an **expected** change. The validator checks the list of **actual** changes (from the diff) to see if any match the expected mutation. For each mutation:
+
+- **expected**: The mutation as described in the verifier spec (what you want to see happen).
+- **actual**: The matching mutation found in the diff (what actually happened), or `null` if not found.
+
+A match is determined by comparing the fields in the verifier to those in the diff:
+
+- For `INSERT`, the `tablename` and all specified `values` must match.
+- For `UPDATE`, the `tablename`, all specified `where` conditions, and all specified `values` must match.
+- For `DELETE`, the `tablename` and all specified `where` conditions must match.
+
 #### Value Matchers
 
-- Literal values (string, number, boolean, null)
-- Regex match: `{ "type": "regex", "regex": "^bar.*" }`
-- Mutation variable: `{ "type": "mutation_variable", "name": "id" }` (matches any value, placeholder)
-- Semantic match: `{ "type": "semantic_match_variable", "description": "should be bar" }` (placeholder, always matches)
+- **Literal values**: Direct equality (e.g., `"id": 1` matches only if the actual value is `1`).
+- **Regex match**: `{ "type": "regex", "regex": "^bar.*" }` matches any string value starting with "bar".
+- **Mutation variable**: `{ "type": "mutation_variable", "name": "id" }` matches any value (acts as a wildcard, useful for ignoring specific values).
+- **Semantic match**: `{ "type": "semantic_match_variable", "description": "should be bar" }` always matches (placeholder for future semantic checks).
+
+##### Example: Matching Behavior
+
+If your verifier contains:
+
+```json
+{
+  "action": "INSERT",
+  "tablename": "foo",
+  "values": {
+    "id": { "type": "mutation_variable", "name": "id" },
+    "name": "bar"
+  }
+}
+```
+
+And the diff contains:
+
+```json
+{ "table": "foo", "method": "insert", "record": { "id": 42, "name": "bar" } }
+```
+
+This is considered a match, because `id` is a mutation variable (matches any value), and `name` matches exactly.
 
 ### Output
 
@@ -112,7 +170,7 @@ For each mutation in the verifier, prints a line:
 ### Example
 
 ```sh
-bun validate.ts verifier.json diff.json
+bun validate.ts ./data/verifier.json ./data/diff.json
 ```
 
 #### Example Output
