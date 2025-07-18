@@ -1,0 +1,34 @@
+{
+  "verifier": {
+    "type": "state_mutation_match",
+    "mutations": [
+      {
+        "action": "UPDATE",
+        "tablename": "foo",
+        "where": {
+          "id": 1
+        },
+        "values": {
+          "name": "baz"
+        }
+      }
+    ]
+  },
+  "diffs": [
+    {
+      "table": "foo",
+      "method": "update",
+      "where": {
+        "id": 1
+      },
+      "record": {
+        "name": "baz"
+      }
+    }
+  ],
+  "expected": {
+    "success": true,
+    "type": "UPDATE",
+    "matched_count": 1
+  }
+}

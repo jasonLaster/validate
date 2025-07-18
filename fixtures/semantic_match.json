@@ -1,0 +1,31 @@
+{
+  "verifier": {
+    "type": "state_mutation_match",
+    "mutations": [
+      {
+        "action": "INSERT",
+        "tablename": "foo",
+        "values": {
+          "name": {
+            "type": "semantic_match_variable",
+            "description": "should be bar"
+          }
+        }
+      }
+    ]
+  },
+  "diffs": [
+    {
+      "table": "foo",
+      "method": "insert",
+      "record": {
+        "name": "bar"
+      }
+    }
+  ],
+  "expected": {
+    "success": true,
+    "type": "INSERT",
+    "matched_count": 1
+  }
+}

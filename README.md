@@ -191,6 +191,36 @@ Both implementations include comprehensive test suites covering:
 - Semantic matching (placeholder)
 - Update operations with WHERE clauses
 
+### Shared JSON Fixtures
+
+Both test suites use shared JSON fixtures to ensure consistency:
+
+- `fixtures/` - Directory containing all test fixtures
+- `test_runner.py` - Python test runner for JSON fixtures
+- `test_runner.ts` - TypeScript test runner for JSON fixtures
+
+The JSON fixtures provide reusable test data for:
+
+- Verifier specifications (exact matches, regex, mutation variables, etc.)
+- Diff data (inserts, updates, deletes)
+- Expected results for validation
+
+Each fixture file contains:
+
+```json
+{
+  "verifier": {
+    /* verifier specification */
+  },
+  "diffs": [
+    /* array of diff objects */
+  ],
+  "expected": {
+    /* expected test results */
+  }
+}
+```
+
 Run tests with:
 
 ```bash
@@ -199,4 +229,8 @@ bun test validate.test.ts
 
 # Python
 python -m pytest validate_test.py -v
+
+# Shared test runners (runs all JSON fixtures)
+python test_runner.py
+bun test_runner.ts
 ```

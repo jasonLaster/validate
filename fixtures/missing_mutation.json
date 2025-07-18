@@ -1,0 +1,21 @@
+{
+  "verifier": {
+    "type": "state_mutation_match",
+    "mutations": [
+      {
+        "action": "INSERT",
+        "tablename": "foo",
+        "values": {
+          "id": 1,
+          "name": "bar"
+        }
+      }
+    ]
+  },
+  "diffs": [],
+  "expected": {
+    "success": false,
+    "type": "INSERT",
+    "matched_count": 0
+  }
+}
