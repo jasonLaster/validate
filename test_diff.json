@@ -1,0 +1,21 @@
+[
+  {
+    "table": "users",
+    "method": "insert",
+    "record": {
+      "id": 1,
+      "name": "John Doe",
+      "email": "john@example.com"
+    }
+  },
+  {
+    "table": "users",
+    "method": "update",
+    "where": {
+      "id": 1
+    },
+    "record": {
+      "name": "Jane Doe"
+    }
+  }
+]

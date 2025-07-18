@@ -1,0 +1,27 @@
+{
+  "type": "state_mutation_match",
+  "mutations": [
+    {
+      "action": "INSERT",
+      "tablename": "users",
+      "values": {
+        "id": 1,
+        "name": "John Doe",
+        "email": {
+          "type": "regex",
+          "regex": ".*@example\\.com"
+        }
+      }
+    },
+    {
+      "action": "UPDATE",
+      "tablename": "users",
+      "where": {
+        "id": 1
+      },
+      "values": {
+        "name": "Jane Doe"
+      }
+    }
+  ]
+}
