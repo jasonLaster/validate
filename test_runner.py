@@ -8,7 +8,7 @@ import json
 import os
 import glob
 from typing import Dict, Any, List
-from validate import validate, StateMutationMatchVerifier, MutationVerifier, DiffInsert, DiffUpdate, DiffDelete
+from validate import validate
 
 
 def load_fixture(fixture_path: str) -> Dict[str, Any]:
@@ -17,43 +17,14 @@ def load_fixture(fixture_path: str) -> Dict[str, Any]:
         return json.load(f)
 
 
-def convert_verifier_to_object(verifier_data: Dict[str, Any]) -> StateMutationMatchVerifier:
-    """Convert JSON verifier data to Python objects"""
-    mutations = []
-    for mutation_data in verifier_data["mutations"]:
-        mutations.append(MutationVerifier(**mutation_data))
-    
-    return StateMutationMatchVerifier(
-        type=verifier_data["type"],
-        mutations=mutations
-    )
-
-
-def convert_diffs_to_objects(diffs_data: List[Dict[str, Any]]) -> List:
-    """Convert JSON diff data to Python objects"""
-    diffs = []
-    for diff_data in diffs_data:
-        if diff_data["method"] == "insert":
-            diffs.append(DiffInsert(**diff_data))
-        elif diff_data["method"] == "update":
-            diffs.append(DiffUpdate(**diff_data))
-        elif diff_data["method"] == "delete":
-            diffs.append(DiffDelete(**diff_data))
-    return diffs
-
-
 def run_fixture_test(fixture_path: str) -> Dict[str, Any]:
     """Run a single fixture test"""
     fixture = load_fixture(fixture_path)
-    
-    verifier = convert_verifier_to_object(fixture["verifier"])
-    diffs = convert_diffs_to_objects(fixture["diffs"])
-    
+    verifier = fixture["verifier"]
+    diffs = fixture["diffs"]
     results = validate(verifier, diffs)
-    
     # Count successful matches
-    matched_count = sum(1 for r in results if r.success)
-    
+    matched_count = sum(1 for r in results if r["success"])
     return {
         "fixture": os.path.basename(fixture_path),
         "results": results,
@@ -66,7 +37,6 @@ def run_all_fixture_tests() -> List[Dict[str, Any]]:
     """Run all fixture tests"""
     fixture_dir = "fixtures"
     fixture_files = glob.glob(os.path.join(fixture_dir, "*.json"))
-    
     test_results = []
     for fixture_path in sorted(fixture_files):
         try:
@@ -79,7 +49,6 @@ def run_all_fixture_tests() -> List[Dict[str, Any]]:
                 "fixture": os.path.basename(fixture_path),
                 "error": str(e)
             })
-    
     return test_results
 
 
@@ -87,15 +56,11 @@ def main():
     """Main test runner"""
     print("🧪 Running shared fixture tests...")
     print("=" * 50)
-    
     results = run_all_fixture_tests()
-    
     print("\n" + "=" * 50)
     print("📊 Test Summary:")
-    
     passed = 0
     failed = 0
-    
     for result in results:
         if "error" in result:
             failed += 1
@@ -106,9 +71,7 @@ def main():
         else:
             failed += 1
             print(f"❌ {result['fixture']}: FAIL - Expected {result['expected']['matched_count']}, got {result['matched_count']}")
-    
     print(f"\n🎯 Results: {passed} passed, {failed} failed")
-    
     if failed == 0:
         print("🎉 All tests passed!")
         return 0
