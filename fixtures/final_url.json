@@ -7,14 +7,13 @@
           "action": "INSERT",
           "tablename": "foo",
           "values": {
-            "name": {
-              "type": "semantic_match_variable",
-              "description": "should be bar"
-            }
+            "id": 1,
+            "name": "bar"
           }
         }
       ]
-    }
+    },
+    "final_url": "https://example.com/result"
   },
   "results": {
     "state": {
@@ -23,11 +22,13 @@
           "table": "foo",
           "method": "insert",
           "record": {
+            "id": 1,
             "name": "bar"
           }
         }
       ]
-    }
+    },
+    "final_url": "https://example.com/result"
   },
   "expected": {
     "verifiers": [
@@ -37,6 +38,7 @@
           "table": "foo",
           "method": "insert",
           "record": {
+            "id": 1,
             "name": "bar"
           }
         },
@@ -44,18 +46,22 @@
           "action": "INSERT",
           "tablename": "foo",
           "values": {
-            "name": {
-              "type": "semantic_match_variable",
-              "description": "should be bar"
-            }
+            "id": 1,
+            "name": "bar"
           }
         },
         "type": "mutation"
+      },
+      {
+        "success": true,
+        "actual": "https://example.com/result",
+        "expected": "https://example.com/result",
+        "type": "final_url"
       }
     ],
     "result": true,
-    "totalVerifiers": 1,
-    "passedVerifiers": 1,
-    "matched_count": 1
+    "totalVerifiers": 2,
+    "passedVerifiers": 2,
+    "matched_count": 2
   }
 }

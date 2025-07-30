@@ -80,24 +80,59 @@ def match_mutation(verifier: Dict[str, Any], diff: Dict[str, Any]) -> bool:
     return False
 
 
-def validate(verifier: Dict[str, Any], diffs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    if verifier["type"] != "state_mutation_match":
-        raise ValueError("Unsupported verifier type")
+def validate(
+    verifier: Dict[str, Any], 
+    results: Dict[str, Any],
+    ) -> List[Dict[str, Any]]:
+    """
+    Validate a verifier against a list of diffs, return_value, final_url, and agent_error.
+    """
 
-    results: List[Dict[str, Any]] = []
-    for mutation in verifier["mutations"]:
+    verifier_results: List[Dict[str, Any]] = []
+    for mutation in verifier["state"]["mutations"]:
         found = None
-        for diff in diffs:
+        for diff in results["state"]["mutations"]:
             if match_mutation(mutation, diff):
                 found = diff
                 break
 
-        results.append({
+        verifier_results.append({
             "success": found is not None,
             "actual": found,
             "expected": mutation,
-            "type": mutation["action"],
+            "type": "mutation",
         })
+        
+    if verifier.get("return_value") is not None:
+        verifier_results.append({
+            "success": match_value(verifier["return_value"], results.get("return_value")),
+            "actual": results.get("return_value"),
+            "expected": verifier["return_value"],
+            "type": "return_value",
+        })
+        
+    if verifier.get("final_url") is not None:
+        verifier_results.append({
+            "success": match_value(verifier["final_url"], results.get("final_url")),
+            "actual": results.get("final_url"),
+            "expected": verifier["final_url"],
+            "type": "final_url",
+        })
+        
+    if verifier.get("agent_error") is not None:
+        verifier_results.append({
+            "success": match_value(verifier["agent_error"], results.get("agent_error")),
+            "actual": results.get("agent_error"),
+            "expected": verifier["agent_error"],
+            "type": "agent_error",
+        })
+
+    results = {
+        "verifiers": verifier_results,
+        "result": all(r["success"] for r in verifier_results),
+        "totalVerifiers": len(verifier_results),
+        "passedVerifiers": sum(1 for r in verifier_results if r["success"]),
+    }
 
     return results
 

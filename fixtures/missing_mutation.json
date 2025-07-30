@@ -1,21 +1,43 @@
 {
   "verifier": {
     "type": "state_mutation_match",
-    "mutations": [
-      {
-        "action": "INSERT",
-        "tablename": "foo",
-        "values": {
-          "id": 1,
-          "name": "bar"
+    "state": {
+      "mutations": [
+        {
+          "action": "INSERT",
+          "tablename": "foo",
+          "values": {
+            "id": 1,
+            "name": "bar"
+          }
         }
-      }
-    ]
+      ]
+    }
   },
-  "diffs": [],
+  "results": {
+    "state": {
+      "mutations": []
+    }
+  },
   "expected": {
-    "success": false,
-    "type": "INSERT",
+    "verifiers": [
+      {
+        "success": false,
+        "actual": null,
+        "expected": {
+          "action": "INSERT",
+          "tablename": "foo",
+          "values": {
+            "id": 1,
+            "name": "bar"
+          }
+        },
+        "type": "mutation"
+      }
+    ],
+    "result": false,
+    "totalVerifiers": 1,
+    "passedVerifiers": 0,
     "matched_count": 0
   }
 }

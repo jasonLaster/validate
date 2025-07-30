@@ -12,7 +12,10 @@
           }
         }
       ]
-    }
+    },
+    "return_value": "success",
+    "final_url": "https://example.com/result",
+    "agent_error": false
   },
   "results": {
     "state": {
@@ -26,7 +29,10 @@
           }
         }
       ]
-    }
+    },
+    "return_value": "success",
+    "final_url": "https://example.com/result",
+    "agent_error": false
   },
   "expected": {
     "verifiers": [
@@ -49,11 +55,29 @@
           }
         },
         "type": "mutation"
+      },
+      {
+        "success": true,
+        "actual": "success",
+        "expected": "success",
+        "type": "return_value"
+      },
+      {
+        "success": true,
+        "actual": "https://example.com/result",
+        "expected": "https://example.com/result",
+        "type": "final_url"
+      },
+      {
+        "success": true,
+        "actual": false,
+        "expected": false,
+        "type": "agent_error"
       }
     ],
     "result": true,
-    "totalVerifiers": 1,
-    "passedVerifiers": 1,
-    "matched_count": 1
+    "totalVerifiers": 4,
+    "passedVerifiers": 4,
+    "matched_count": 4
   }
 }

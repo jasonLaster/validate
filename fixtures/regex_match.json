@@ -1,31 +1,61 @@
 {
   "verifier": {
     "type": "state_mutation_match",
-    "mutations": [
-      {
-        "action": "INSERT",
-        "tablename": "foo",
-        "values": {
-          "name": {
-            "type": "regex",
-            "regex": ".*bar.*"
+    "state": {
+      "mutations": [
+        {
+          "action": "INSERT",
+          "tablename": "foo",
+          "values": {
+            "name": {
+              "type": "regex",
+              "regex": ".*bar.*"
+            }
           }
         }
-      }
-    ]
-  },
-  "diffs": [
-    {
-      "table": "foo",
-      "method": "insert",
-      "record": {
-        "name": "hello bar world"
-      }
+      ]
     }
-  ],
+  },
+  "results": {
+    "state": {
+      "mutations": [
+        {
+          "table": "foo",
+          "method": "insert",
+          "record": {
+            "name": "hello bar world"
+          }
+        }
+      ]
+    }
+  },
   "expected": {
-    "success": true,
-    "type": "INSERT",
+    "verifiers": [
+      {
+        "success": true,
+        "actual": {
+          "table": "foo",
+          "method": "insert",
+          "record": {
+            "name": "hello bar world"
+          }
+        },
+        "expected": {
+          "action": "INSERT",
+          "tablename": "foo",
+          "values": {
+            "name": {
+              "type": "regex",
+              "regex": ".*bar.*"
+            }
+          }
+        },
+        "type": "mutation"
+      }
+    ],
+    "result": true,
+    "totalVerifiers": 1,
+    "passedVerifiers": 1,
     "matched_count": 1
   }
 }
