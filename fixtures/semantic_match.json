@@ -1,20 +1,18 @@
 {
   "verifier": {
     "type": "state_mutation_match",
-    "state": {
-      "mutations": [
-        {
-          "action": "INSERT",
-          "tablename": "foo",
-          "values": {
-            "name": {
-              "type": "semantic_match_variable",
-              "description": "should be bar"
-            }
+    "mutations": [
+      {
+        "action": "INSERT",
+        "tablename": "foo",
+        "values": {
+          "name": {
+            "type": "semantic_match_variable",
+            "description": "should be bar"
           }
         }
-      ]
-    }
+      }
+    ]
   },
   "results": {
     "state": {

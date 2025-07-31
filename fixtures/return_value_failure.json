@@ -1,18 +1,16 @@
 {
   "verifier": {
     "type": "state_mutation_match",
-    "state": {
-      "mutations": [
-        {
-          "action": "INSERT",
-          "tablename": "foo",
-          "values": {
-            "id": 1,
-            "name": "bar"
-          }
+    "mutations": [
+      {
+        "action": "INSERT",
+        "tablename": "foo",
+        "values": {
+          "id": 1,
+          "name": "bar"
         }
-      ]
-    },
+      }
+    ],
     "return_value": "success"
   },
   "results": {

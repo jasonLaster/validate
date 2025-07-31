@@ -89,7 +89,7 @@ def validate(
     """
 
     verifier_results: List[Dict[str, Any]] = []
-    for mutation in verifier["state"]["mutations"]:
+    for mutation in verifier["mutations"]:
         found = None
         for diff in results["state"]["mutations"]:
             if match_mutation(mutation, diff):

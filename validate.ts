@@ -32,6 +32,9 @@ interface MutationVerifier {
 interface StateMutationMatchVerifier {
   type: "state_mutation_match";
   mutations: MutationVerifier[];
+  return_value?: ValueVerifier;
+  final_url?: ValueVerifier;
+  agent_error?: ValueVerifier;
 }
 
 type VerifierSpec = StateMutationMatchVerifier;
@@ -53,6 +56,29 @@ type DiffDelete = {
   where: Record<string, any>;
 };
 type DiffResult = DiffInsert | DiffUpdate | DiffDelete;
+
+interface ResultsData {
+  state: {
+    mutations: DiffResult[];
+  };
+  return_value?: any;
+  final_url?: any;
+  agent_error?: any;
+}
+
+interface VerifierResult {
+  success: boolean;
+  actual: DiffResult | any | null;
+  expected: MutationVerifier | any;
+  type: string;
+}
+
+interface ValidationResult {
+  verifiers: VerifierResult[];
+  result: boolean;
+  totalVerifiers: number;
+  passedVerifiers: number;
+}
 
 function matchRegex(value: any, regex: string): boolean {
   if (typeof value !== "string") return false;
@@ -129,57 +155,103 @@ function matchMutation(verifier: MutationVerifier, diff: DiffResult): boolean {
   return false;
 }
 
-export interface ValidationResult {
-  success: boolean;
-  actual: DiffResult | null;
-  expected: MutationVerifier;
-  type: string;
-}
-
 function validate(
   verifier: VerifierSpec,
-  diffs: DiffResult[]
-): ValidationResult[] {
+  results: ResultsData
+): ValidationResult {
   if (verifier.type !== "state_mutation_match") {
     throw new Error("Unsupported verifier type");
   }
-  const results: ValidationResult[] = [];
+
+  const verifierResults: VerifierResult[] = [];
+
+  // Check mutations
   for (const mutation of verifier.mutations) {
-    const found = diffs.find((diff) => matchMutation(mutation, diff));
-    results.push({
+    const found = results.state.mutations.find((diff) =>
+      matchMutation(mutation, diff)
+    );
+    verifierResults.push({
       success: Boolean(found),
       actual: found || null,
       expected: mutation,
-      type: mutation.action,
+      type: "mutation",
     });
   }
-  return results;
+
+  // Check return_value
+  if (verifier.return_value !== undefined) {
+    verifierResults.push({
+      success: matchValue(verifier.return_value, results.return_value),
+      actual: results.return_value,
+      expected: verifier.return_value,
+      type: "return_value",
+    });
+  }
+
+  // Check final_url
+  if (verifier.final_url !== undefined) {
+    verifierResults.push({
+      success: matchValue(verifier.final_url, results.final_url),
+      actual: results.final_url,
+      expected: verifier.final_url,
+      type: "final_url",
+    });
+  }
+
+  // Check agent_error
+  if (verifier.agent_error !== undefined) {
+    verifierResults.push({
+      success: matchValue(verifier.agent_error, results.agent_error),
+      actual: results.agent_error,
+      expected: verifier.agent_error,
+      type: "agent_error",
+    });
+  }
+
+  const passedVerifiers = verifierResults.filter((r) => r.success).length;
+
+  return {
+    verifiers: verifierResults,
+    result: verifierResults.every((r) => r.success),
+    totalVerifiers: verifierResults.length,
+    passedVerifiers,
+  };
 }
 
 function main() {
-  const [verifierPath, diffPath] = process.argv.slice(2);
-  if (!verifierPath || !diffPath) {
-    console.error("Usage: bun validate.ts <verifier.json> <diff.json>");
+  const [verifierPath, resultsPath] = process.argv.slice(2);
+  if (!verifierPath || !resultsPath) {
+    console.error("Usage: bun validate.ts <verifier.json> <results.json>");
     process.exit(1);
   }
   const verifier: VerifierSpec = JSON.parse(
     fs.readFileSync(verifierPath, "utf-8")
   );
-  const diffs: DiffResult[] = JSON.parse(fs.readFileSync(diffPath, "utf-8"));
-  const results = validate(verifier, diffs);
-  for (const r of results) {
+  const results: ResultsData = JSON.parse(
+    fs.readFileSync(resultsPath, "utf-8")
+  );
+
+  const validationResults = validate(verifier, results);
+
+  for (const r of validationResults.verifiers) {
     if (r.success) {
-      console.log(`✔ Matched mutation: ${r.type} on ${r.expected.tablename}`);
+      console.log(`✔ Matched ${r.type}: ${r.expected.tablename || r.expected}`);
     } else {
       console.log(
-        `✘ No match for mutation: ${r.type} on ${r.expected.tablename}`
+        `✘ No match for ${r.type}: ${r.expected.tablename || r.expected}`
       );
     }
   }
 }
 
 export { validate };
-export type { DiffResult, VerifierSpec, ValidationResult };
+export type {
+  DiffResult,
+  VerifierSpec,
+  ValidationResult,
+  ResultsData,
+  VerifierResult,
+};
 
 if (require.main === module || (import.meta && import.meta.main)) {
   main();
